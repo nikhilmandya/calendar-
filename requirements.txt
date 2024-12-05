@@ -1,0 +1,7 @@
+
+Flask==2.2.3
+Flask-SQLAlchemy==3.0.4
+Werkzeug==2.2.3
+psycopg2-binary==2.9.6
+ics==0.7
+reportlab==3.6.14

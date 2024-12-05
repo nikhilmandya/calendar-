@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h3 class="center-align">Admin Dashboard</h3>
+
+        <!-- Buttons to trigger modals -->
+        <div class="row">
+            <button class="btn waves-effect waves-light modal-trigger" data-target="createUserModal">Create User</button>
+            <button class="btn waves-effect waves-light modal-trigger" data-target="createEventModal">Create Event</button>
+            <button class="btn waves-effect waves-light modal-trigger" data-target="downloadEventsModal">Download Events PDF</button>
+        </div>
+
+        <!-- All Events Table (Displayed by Default) -->
+        <h5>All Events</h5>
+        <table class="striped">
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>User</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.id }}</td>
+                        <td>{{ event.title }}</td>
+                        <td>{{ event.description }}</td>
+                        <td>{{ event.user.username }}</td>
+                        <td>{{ event.start_time }}</td>
+                        <td>{{ event.end_time }}</td>
+                        <td>{{ event.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+        </table>
+
+        <!-- Create User Modal -->
+        <div id="createUserModal" class="modal">
+            <div class="modal-content">
+                <h4>Create User</h4>
+                <form method="POST" action="/admin/create_user">
+                    <div class="input-field">
+                        <input type="text" name="username" id="username" required>
+                        <label for="username">Username</label>
+                    </div>
+                    <div class="input-field">
+                        <input type="password" name="password" id="password" required>
+                        <label for="password">Password</label>
+                    </div>
+                    <p>
+                        <label>
+                            <input type="checkbox" name="is_admin">
+                            <span>Admin</span>
+                        </label>
+                    </p>
+                    <button type="submit" class="btn waves-effect waves-light">Create User</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-close btn-flat">Close</button>
+            </div>
+        </div>
+
+        <!-- Create Event Modal -->
+        <div id="createEventModal" class="modal">
+            <div class="modal-content">
+                <h4>Create Event</h4>
+                <form method="POST" action="/admin/create_event">
+                    <div class="input-field">
+                        <input type="text" name="title" id="title" required>
+                        <label for="title">Title</label>
+                    </div>
+                    <div class="input-field">
+                        <textarea name="description" id="description" class="materialize-textarea"></textarea>
+                        <label for="description">Description</label>
+                    </div>
+                    <div class="input-field">
+                        <select name="user_id" required>
+                            <option value="" disabled selected>Select User</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.username }} (ID: {{ user.id }})</option>
+                            {% endfor %}
+                        </select>
+                        <label>User</label>
+                    </div>
+                    <div class="input-field">
+                        <input type="text" name="start_date" id="start_date" class="datepicker" required>
+                        <label for="start_date">Start Date</label>
+                    </div>
+                    <div class="input-field">
+                        <input type="text" name="start_time" id="start_time" class="timepicker" required>
+                        <label for="start_time">Start Time</label>
+                    </div>
+                    <div class="input-field">
+                        <input type="text" name="end_date" id="end_date" class="datepicker" required>
+                        <label for="end_date">End Date</label>
+                    </div>
+                    <div class="input-field">
+                        <input type="text" name="end_time" id="end_time" class="timepicker" required>
+                        <label for="end_time">End Time</label>
+                    </div>
+                    <button type="submit" class="btn waves-effect waves-light">Create Event</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-close btn-flat">Close</button>
+            </div>
+        </div>
+
+        <!-- Download Events Modal -->
+        <div id="downloadEventsModal" class="modal">
+            <div class="modal-content">
+                <h4>Download Events PDF</h4>
+                <form method="POST" action="/admin/download_pdf">
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input type="date" name="start_date" id="start_date" required>
+                            <label for="start_date">Start Date</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input type="date" name="end_date" id="end_date" required>
+                            <label for="end_date">End Date</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn waves-effect waves-light">Download PDF</button>
+                        <button class="modal-close btn-flat">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materialize JS and Initialization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize modals
+            var modals = document.querySelectorAll('.modal');
+            M.Modal.init(modals);
+
+            // Initialize date pickers
+            var datepickers = document.querySelectorAll('.datepicker');
+            M.Datepicker.init(datepickers, {
+                format: 'yyyy-mm-dd',
+                autoClose: true,
+                showClearBtn: true
+            });
+
+            // Initialize time pickers
+            var timepickers = document.querySelectorAll('.timepicker');
+            M.Timepicker.init(timepickers, {
+                autoClose: true,
+                twelveHour: false
+            });
+
+            // Initialize select dropdowns
+            var selects = document.querySelectorAll('select');
+            M.FormSelect.init(selects);
+        });
+    </script>
+</body>
+</html>
